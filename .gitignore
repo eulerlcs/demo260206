@@ -1,0 +1,106 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# Generated additions for Java / Spring Boot projects
+
+# Compiled class files
+*.class
+
+# Log files
+logs/
+*.log
+
+# Runtime files
+*.pid
+*.seed
+
+# Eclipse (already covered but keep robust)
+.project
+.classpath
+.settings/
+
+# IntelliJ IDEA (already covered)
+.idea/
+*.iml
+out/
+
+# VS Code (already covered)
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Temporary files
+*~
+*.swp
+*.tmp
+
+# Test / report output
+/target/surefire-reports/
+/target/failsafe-reports/
+
+# Coverage
+jacoco.exec
+coverage/
+
+# Environment files
+.env
+.env.*
+
+# Node (if any)
+node_modules/
+
+# Distribution archives
+*.zip
+*.tar.gz
+*.jar
+
+# Spring Boot devtools cache
+.restart
+
+# Local settings
+/local.properties
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# Ignore IDE run configs
+*.launch
+
+# keep README and important files tracked
+!README.md
