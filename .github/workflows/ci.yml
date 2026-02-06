@@ -91,6 +91,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Download built JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: target
+
       - name: Set up JDK 21 (Temurin) and configure GitHub Packages server
         uses: actions/setup-java@v4
         with:
