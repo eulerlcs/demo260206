@@ -135,13 +135,7 @@ jobs:
         run: |
           echo "Deploying $JAR_FILE as $GROUP_ID:$ARTIFACT_ID:$VERSION to GitHub Packages"
           # run with debug and generate a POM if missing to avoid deploy failures
-          mvn -X deploy:deploy-file \
-            -DgeneratePom=true \
-            \
-            -DgroupId=${GROUP_ID} \
-            -DartifactId=${ARTIFACT_ID} \
-            -Dversion=${VERSION} \
-            -Dpackaging=jar \
+          mvn -X deploy \
             -Dfile=${JAR_FILE} \
             -DrepositoryId=github \
             -Durl=https://maven.pkg.github.com/${{ github.repository }}
