@@ -80,3 +80,59 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ env.MAVEN_VERSION }}
             ${{ env.IMAGE_NAME }}:${{ env.SHORT_SHA }}
+
+  publish-package:
+    name: Publish JAR to GitHub Packages (Maven)
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin) and configure GitHub Packages server
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: maven
+          server-id: github
+          server-username: ${{ github.actor }}
+          server-password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show built artifacts
+        run: |
+          ls -la target || true
+
+      - name: Resolve Maven coordinates and jar file
+        id: vars
+        run: |
+          GROUP_ID=$(mvn -q -DforceStdout=true help:evaluate -Dexpression=project.groupId)
+          ARTIFACT_ID=$(mvn -q -DforceStdout=true help:evaluate -Dexpression=project.artifactId)
+          VERSION=$(mvn -q -DforceStdout=true help:evaluate -Dexpression=project.version)
+          echo "GROUP_ID=$GROUP_ID" >> $GITHUB_ENV
+          echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          # try to find the jar file in target/
+          JAR_FILE=$(ls target/*.jar | head -n 1 || true)
+          if [ -z "$JAR_FILE" ]; then
+            echo "No jar file found in target/" >&2
+            exit 1
+          fi
+          echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV
+
+      - name: Deploy jar to GitHub Packages (Maven)
+        env:
+          MAVEN_USERNAME: ${{ github.actor }}
+          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Deploying $JAR_FILE as $GROUP_ID:$ARTIFACT_ID:$VERSION to GitHub Packages"
+          mvn deploy:deploy-file \
+            -DgroupId=${GROUP_ID} \
+            -DartifactId=${ARTIFACT_ID} \
+            -Dversion=${VERSION} \
+            -Dpackaging=jar \
+            -Dfile=${JAR_FILE} \
+            -DrepositoryId=github \
+            -Durl=https://maven.pkg.github.com/${{ github.repository }}
