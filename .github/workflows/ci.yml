@@ -105,7 +105,7 @@ jobs:
           cache: maven
           server-id: github
           server-username: ${{ github.actor }}
-          server-password: ${{ secrets.GITHUB_TOKEN }}
+          server-password: ${{ secrets.GH_PACKAGES_TOKEN }}
 
       - name: Show built artifacts
         run: |
@@ -131,7 +131,7 @@ jobs:
       - name: Deploy jar to GitHub Packages (Maven)
         env:
           MAVEN_USERNAME: ${{ github.actor }}
-          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
           echo "Deploying $JAR_FILE as $GROUP_ID:$ARTIFACT_ID:$VERSION to GitHub Packages"
           # run with debug and generate a POM if missing to avoid deploy failures
