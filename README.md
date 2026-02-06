@@ -110,6 +110,98 @@ curl "http://localhost:8080/add?a=2&b=3"
 
 ---
 
+## Docker
+
+ローカルでイメージを作成して実行する手順、GHCR へプッシュする例、およびクリーンアップ方法を示します。
+
+### 前提
+
+- Docker がインストールされ、動作していること
+- プロジェクトルートに `Dockerfile` が存在すること（このリポジトリでは multi-stage の `Dockerfile` を用意しています）
+
+### ローカルでビルド
+
+Windows (cmd.exe):
+
+```cmd
+cd /d %CD%
+:: プロジェクトルートで実行
+docker build -t demo-app:latest .
+```
+
+macOS / Linux (bash):
+
+```bash
+docker build -t demo-app:latest .
+```
+
+ビルド後、`docker images` で `demo-app:latest` が作成されていることを確認してください。
+
+### コンテナを起動
+
+Windows (cmd.exe):
+
+```cmd
+docker run -d -p 8080:8080 --name demo-app demo-app:latest
+```
+
+ログ確認:
+
+```cmd
+docker logs -f demo-app
+```
+
+ホストからの HTTP 確認（curl がある場合）:
+
+```cmd
+curl http://localhost:8080/
+```
+
+PowerShell の場合:
+
+```powershell
+Invoke-WebRequest -Uri http://localhost:8080/ -UseBasicParsing
+```
+
+### GitHub Container Registry (GHCR) に Push する（例）
+
+GitHub Actions を使う場合は、リポジトリに `GITHUB_TOKEN` があるため追加の設定なく Actions でプッシュできます（このリポジトリには `.github/workflows/ci.yml` を用意済み）。
+
+ローカルから手動で push する場合の手順（例）:
+
+1. Personal Access Token (PAT) を作成し、`write:packages` スコープを付与
+2. ログインしてタグ付け、プッシュ
+
+Windows (cmd.exe):
+
+```cmd
+set CR_PAT=ghp_xxx...   :: ご自身の PAT を環境変数にセット
+echo %CR_PAT% | docker login ghcr.io -u <USERNAME> --password-stdin
+docker tag demo-app:latest ghcr.io/<OWNER>/<REPO>:latest
+docker push ghcr.io/<OWNER>/<REPO>:latest
+```
+
+bash:
+
+```bash
+export CR_PAT=ghp_xxx...
+echo "$CR_PAT" | docker login ghcr.io -u <USERNAME> --password-stdin
+docker tag demo-app:latest ghcr.io/<OWNER>/<REPO>:latest
+docker push ghcr.io/<OWNER>/<REPO>:latest
+```
+
+注意: GitHub Actions 内では `GITHUB_TOKEN` を使うため PAT は不要。リポジトリ/組織の設定により追加の権限が必要な場合があります。
+
+### クリーンアップ
+
+```cmd
+docker stop demo-app || echo not-running
+docker rm demo-app || echo not-found
+docker rmi demo-app:latest || echo not-found
+```
+
+---
+
 ## ライセンス
 
 このリポジトリにライセンスファイルがない場合は利用制限に注意してください。
