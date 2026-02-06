@@ -134,7 +134,10 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Deploying $JAR_FILE as $GROUP_ID:$ARTIFACT_ID:$VERSION to GitHub Packages"
-          mvn deploy:deploy-file \
+          # run with debug and generate a POM if missing to avoid deploy failures
+          mvn -X deploy:deploy-file \
+            -DgeneratePom=true \
+            \
             -DgroupId=${GROUP_ID} \
             -DartifactId=${ARTIFACT_ID} \
             -Dversion=${VERSION} \
@@ -142,3 +145,4 @@ jobs:
             -Dfile=${JAR_FILE} \
             -DrepositoryId=github \
             -Durl=https://maven.pkg.github.com/${{ github.repository }}
+          echo "mvn exit code: $?"
